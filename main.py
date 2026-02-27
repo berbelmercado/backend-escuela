@@ -1,4 +1,4 @@
-from profesor import Profesor
+from src.entities.profesor import Profesor
 
 prof1 = Profesor("Carlos Pérez", 101, "Matemáticas")
 prof1.asignar_materia("Álgebra")
