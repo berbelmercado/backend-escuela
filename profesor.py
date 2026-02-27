@@ -1,11 +1,11 @@
-class profesor:
+class Profesor:
     def __init__(self, nombre, id_profesor, especialidad):
         self.nombre = nombre
         self.id_profesor = id_profesor
         self.especialidad = especialidad
         self.materias = []
 
-    def asignar_materias(self, materia):
+    def asignar_materia(self, materia):
         self.materias.append(materia)
 
     def mostrar_info(self):
