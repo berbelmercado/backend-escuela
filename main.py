@@ -14,6 +14,8 @@ def menu() -> None:
     print("3. Actualizar estado de una materia")
     print("4.Crear nuevo profesor")
 
+    print("Mostrar profesores registrados")
+
 
 def main() -> None:
     opciones = [
@@ -41,6 +43,11 @@ def main() -> None:
                 print(materia.consultar_asingaturas())
         if opcion == 4:
             obj_profesor = Profesor(*GestionProfesor.captura_datos_profesor())
+            profesores.append(obj_profesor)
+            print("Profesor registrado exitosamente.")
+        if opcion == 5:
+            for profesor in profesores:
+                profesor.mostrar_info()
 
 
 if __name__ == "__main__":
