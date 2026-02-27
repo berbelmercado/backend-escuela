@@ -14,7 +14,7 @@ def menu() -> None:
     print("3. Actualizar estado de una materia")
     print("4.Crear nuevo profesor")
 
-    print("Mostrar profesores registrados")
+    print("5.Mostrar profesores registrados")
 
 
 def main() -> None:
@@ -23,6 +23,7 @@ def main() -> None:
         2,
         3,
         4,
+        5,
     ]
     while True:
 
