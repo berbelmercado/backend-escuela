@@ -1,4 +1,5 @@
 .env
+envEscuela
 # 🔹 Archivos de distribución / build
 build/
 dist/
@@ -23,7 +24,7 @@ secrets.json
 .coverage
 htmlcov/
 .pytest_cache/
-
+__pycache__/
 # 🔹 Archivos de sistema
 .DS_Store
 Thumbs.db
