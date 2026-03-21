@@ -1,6 +1,8 @@
-from database.config import SessionLocal
+from database.config import SessionLocal, Base, engine
 from crud.estudiante_crud import EstudianteCrud
 from datetime import date
+
+Base.metadata.create_all(bind=engine)
 
 db = SessionLocal()
 
