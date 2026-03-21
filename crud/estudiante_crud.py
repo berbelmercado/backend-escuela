@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from datetime import date
 
 
-class Estudiante_crud:
+class EstudianteCrud:
 
     def __init__(self, db: Session):
         self.db = db
@@ -22,10 +22,10 @@ class Estudiante_crud:
     ) -> Estudiante:
         estudiante = Estudiante(
             cedula=cedula.strip(),
-            nombre=nombre.strip().capitalize(),
-            apellido=apellido.strip().capitalize(),
+            nombre=nombre.strip().title(),
+            apellido=apellido.strip().title(),
             email=email.strip(),
-            sexo=sexo.strip().capitalize(),
+            sexo=sexo.strip().title(),
             fecha_nacimiento=fecha_nacimiento,
             no_celular=no_celular.strip(),
         )
@@ -34,7 +34,7 @@ class Estudiante_crud:
         self.db.refresh(estudiante)
         return estudiante
 
-    def obtener_estudiante(self, id_estudiante=UUID):
+    def obtener_estudiante(self, id_estudiante: UUID):
         return (
             self.db.query(Estudiante)
             .filter(Estudiante.id_estudiante == id_estudiante)
@@ -62,3 +62,17 @@ class Estudiante_crud:
         self.db.commit()
         self.db.refresh(estudiante)
         return estudiante
+
+    def eliminar_estudiante(self, id_estudiante) -> bool:
+        estudiante = (
+            self.db.query(Estudiante)
+            .filter(Estudiante.id_estudiante == id_estudiante)
+            .first()
+        )
+
+        if not estudiante:
+            raise ValueError("No existe estudiante")
+
+        self.db.delete(estudiante)
+        self.db.commit()
+        return True
