@@ -1,0 +1,36 @@
+.env
+# 🔹 Archivos de distribución / build
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# 🔹 Archivos de IDEs / editores
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Archivos de configuración sensibles
+config.json
+secrets.json
+*.env
+
+# Exportaciones
+*.csv
+*.xlsx
+# 🔹 Archivos de testing
+.coverage
+htmlcov/
+.pytest_cache/
+
+# 🔹 Archivos de sistema
+.DS_Store
+Thumbs.db
+
+# 🔹 Archivos de Jupyter
+.ipynb_checkpoints
+
+# 🔹 Archivos temporales
+*.tmp
+*.bak
