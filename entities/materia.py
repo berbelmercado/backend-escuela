@@ -1,7 +1,7 @@
 import uuid
 from sqlalchemy import Column, String, DateTime, func
 from sqlalchemy.dialects.postgresql import UUID
-from database.configuracion import Base
+from database.config import Base
 
 
 class Materia(Base):
