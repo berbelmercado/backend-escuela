@@ -1,6 +1,6 @@
 import uuid
 from database.config import Base
-from sqlalchemy import Column, DateTime, String
+from sqlalchemy import Column, DateTime, String, Date
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -16,8 +16,8 @@ class Estudiante(Base):
     cedula = Column(String(20), nullable=False)
     nombre = Column(String(100), nullable=False)
     apellido = Column(String(100), nullable=False)
-    email_estudiante = Column(String(255), unique=True, nullable=False)
-    sexo_estudiante = Column(String(8), nullable=False)
-    fecha_nacimiento = Column(DateTime, nullable=False)
+    email = Column(String(255), unique=True, nullable=False)
+    sexo = Column(String(8), nullable=False)
+    fecha_nacimiento = Column(Date, nullable=False)
     no_celular = Column(String(20), nullable=True)
     fecha_creacion = Column(DateTime, server_default=func.now())
