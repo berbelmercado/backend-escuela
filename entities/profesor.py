@@ -1,3 +1,4 @@
+from math import prod
 import uuid
 from sqlalchemy import Column, String, DateTime, func
 from sqlalchemy.dialects.postgresql import UUID
