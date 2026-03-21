@@ -1,41 +1,99 @@
 from database.config import SessionLocal, Base, engine
 from crud.estudiante_crud import EstudianteCrud
-from datetime import date
+from datetime import datetime
+from uuid import UUID
 
 Base.metadata.create_all(bind=engine)
 
-db = SessionLocal()
 
-obj_estudiante = EstudianteCrud(db)
+def mostrar_menu():
+    print("\n===== MENÚ =====")
+    print("1. Crear estudiante")
+    print("2. Listar estudiantes")
+    print("3. Buscar estudiante por ID")
+    print("4. Actualizar estudiante")
+    print("5. Eliminar estudiante")
+    print("0. Salir")
 
-nuevo = obj_estudiante.crear_estudiante(
-    cedula="3245345",
-    nombre="Camilo",
-    apellido="Pelaez",
-    email="camiloPelaez@test.com",
-    sexo="M",
-    fecha_nacimiento=date(1997, 1, 12),
-    no_celular="554323898",
-)
 
-print("Creado:", nuevo.id_estudiante)
+def main():
+    db = SessionLocal()
+    crud = EstudianteCrud(db)
 
-# consultar estudiantes
-list_estudiante = obj_estudiante.obtener_estudiantes()
+    try:
+        while True:
+            mostrar_menu()
+            opcion = input("Seleccione una opción: ")
 
-for i in list_estudiante:
-    print(
-        f"""cedula: {i.cedula} nombre: {i.nombre} apellido: {i.apellido} email: {i.email} sexo: {i.sexo} fecha de nacimiento: {i.fecha_nacimiento} Numero De Celular: {i.no_celular}"""
-    )
+            # 🔹 CREATE
+            if opcion == "1":
+                cedula = input("Cédula: ")
+                nombre = input("Nombre: ")
+                apellido = input("Apellido: ")
+                email = input("Email: ")
+                sexo = input("Sexo: ")
+                fecha_str = input("Fecha nacimiento (YYYY-MM-DD): ")
+                celular = input("Celular: ")
 
-# Consultar 1 solo estudiante
-list_estudiante = obj_estudiante.obtener_estudiante(
-    id_estudiante="9314ed91-c587-491f-a452-22a88dc6e089"
-)
+                fecha = datetime.strptime(fecha_str, "%Y-%m-%d").date()
 
-print(
-    f"""cedula: {list_estudiante.cedula} nombre: {list_estudiante.nombre} apellido: {list_estudiante.apellido} email: {list_estudiante.email} sexo: {list_estudiante.sexo} fecha de nacimiento: {list_estudiante.fecha_nacimiento} Numero De Celular: {list_estudiante.no_celular}"""
-)
+                estudiante = crud.crear_estudiante(
+                    cedula, nombre, apellido, email, sexo, fecha, celular
+                )
 
-# Eliminar 1 dato
-obj_estudiante.eliminar_estudiante(id_estudiante="d2533c1e-5d26-446b-bac2-f4404a5034aa")
+                print(
+                    f"✅ Creado con ID: {estudiante.id_estudiante}, nombre:{estudiante.nombre} apellido: {estudiante.apellido}"
+                )
+
+            # 🔹 READ ALL
+            elif opcion == "2":
+                estudiantes = crud.obtener_estudiantes()
+
+                for e in estudiantes:
+                    print(
+                        f" Id: {e.id_estudiante}  Cedula: {e.cedula} | Nombre:{e.nombre} {e.apellido} | Correo: {e.email} | Celular{e.no_celular}"
+                    )
+
+            # 🔹 READ ONE
+            elif opcion == "3":
+                id_est = UUID(input("Ingrese ID: "))
+                estudiante = crud.obtener_estudiante(id_est)
+
+                if estudiante:
+                    print(
+                        f"{estudiante.nombre} {estudiante.apellido} - {estudiante.email}"
+                    )
+                else:
+                    print("❌ No encontrado")
+
+            # 🔹 UPDATE
+            elif opcion == "4":
+                id_est = UUID(input("Ingrese ID a actualizar: "))
+
+                campo = input("Campo a actualizar (nombre, email, etc): ")
+                valor = input("Nuevo valor: ")
+
+                estudiante = crud.actualizar_estudiante(id_est, {campo: valor})
+
+                print("✅ Actualizado:", estudiante.nombre)
+
+            # 🔹 DELETE
+            elif opcion == "5":
+                id_est = UUID(input("Ingrese ID a eliminar: "))
+                crud.eliminar_estudiante(id_est)
+                print("🗑️ Eliminado")
+
+            # 🔹 EXIT
+            elif opcion == "0":
+                print("👋 Saliendo...")
+                break
+
+            else:
+                print("❌ Opción inválida")
+
+    finally:
+        db.close()
+
+
+if __name__ == "__main__":
+    main()
