@@ -1,9 +1,10 @@
+from math import prod
 import uuid
 from sqlalchemy import Column, String, DateTime, func
 from sqlalchemy.dialects.postgresql import UUID
 
 # Esta línea conecta tu tabla con la configuración de Neon que hizo tu compañero
-from database.configuracion import Base
+from database.config import Base
 
 
 class Profesor(Base):
