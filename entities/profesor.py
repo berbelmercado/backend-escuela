@@ -23,4 +23,3 @@ class Profesor(Base):
     fecha_edicion = Column(DateTime, onupdate=func.now())
     id_usuario_creacion = Column(String(50), nullable=True)  # Quién lo creó
     id_usuario_edita = Column(String(50), nullable=True)  # Quién lo editó
-    prod
