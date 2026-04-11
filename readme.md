@@ -161,6 +161,11 @@ Después de activar el entorno virtual, ejecuta:
 ```bash
 python main.py
 ```
+para ejecutar el menú y agregar los datos por consola
+```bash
+uvicorn app:app --reload
+```
+para ejecutar la API
 ---
 
 ##  URL del video
