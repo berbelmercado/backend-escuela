@@ -1,10 +1,8 @@
-from math import prod
 import uuid
-from sqlalchemy import Column, String, DateTime, func
-from sqlalchemy.dialects.postgresql import UUID
-
-# Esta línea conecta tu tabla con la configuración de Neon que hizo tu compañero
 from database.config import Base
+from sqlalchemy import Column, Integer, String
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import relationship
 
 
 class Profesor(Base):
@@ -16,10 +14,7 @@ class Profesor(Base):
     cedula = Column(String(20), unique=True, nullable=False)
     nombre = Column(String(100), nullable=False)
     apellido = Column(String(100), nullable=False)
-    especialidad = Column(String(100), nullable=False)
-
-    # --- TRAZABILIDAD OBLIGATORIA (Punto 2.2 del Examen) ---
-    fecha_creacion = Column(DateTime, server_default=func.now())
-    fecha_edicion = Column(DateTime, onupdate=func.now())
-    id_usuario_creacion = Column(String(50), nullable=True)  # Quién lo creó
-    id_usuario_edita = Column(String(50), nullable=True)  # Quién lo editó
+    sexo = Column(String(20), nullable=False)
+    edad = Column(Integer, nullable=False)
+    inscripciones = relationship("Inscripcion", back_populates="profesor")
+    calificaciones = relationship("Calificaciones", back_populates="profesor")

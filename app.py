@@ -23,7 +23,14 @@ Notas de despliegue:
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from database.config import Base, engine
-from routers import estudiante, curso
+from routers import (
+    asignatura,
+    calificaciones,
+    curso,
+    estudiante,
+    inscripcion,
+    profesor,
+)
 
 # Crear tablas
 Base.metadata.create_all(bind=engine)
@@ -51,6 +58,10 @@ app.add_middleware(
 # Incluir routers
 app.include_router(estudiante.router)
 app.include_router(curso.router)
+app.include_router(profesor.router)
+app.include_router(asignatura.router)
+app.include_router(inscripcion.router)
+app.include_router(calificaciones.router)
 
 
 @app.get("/", tags=["Root"])
@@ -64,6 +75,10 @@ def read_root():
         "endpoints": {
             "estudiantes": "/estudiantes",
             "cursos": "/cursos",
+            "profesores": "/profesores",
+            "asignaturas": "/asignaturas",
+            "inscripciones": "/inscripciones",
+            "calificaciones": "/calificaciones",
             "documentación": "/docs",
         },
     }

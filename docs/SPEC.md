@@ -2,7 +2,7 @@
 
 ## Sistema actual
 
-`backend-escuela` es una aplicacion backend para gestion escolar. En el estado actual del codigo, permite administrar estudiantes y cursos por medio de una API FastAPI y tambien por medio de un menu de consola.
+`backend-escuela` es una aplicacion backend para gestion escolar. En el estado actual del codigo, permite administrar estudiantes, cursos, profesores, asignaturas, inscripciones y calificaciones por medio de una API FastAPI. Tambien conserva un menu de consola para estudiantes y cursos.
 
 El sistema usa SQLAlchemy para definir entidades y ejecutar operaciones de persistencia. La conexion a base de datos se carga desde `.env` mediante la variable `DATABASE_URL`.
 
@@ -66,23 +66,23 @@ Archivo: `entities/profesor.py`
 
 Modelo existente con campos de profesor y trazabilidad. No tiene router FastAPI detectado.
 
-### Materia
+### Asignatura
 
-Archivo: `entities/materia.py`
+Archivo: `entities/asignatura.py`
 
-Modelo existente con codigo, nombre y trazabilidad. No tiene router FastAPI detectado.
+Modelo existente para asignaturas con nombre, horas semanales, modalidad y estado.
 
 ### Inscripcion
 
 Archivo: `entities/inscripcion.py`
 
-Modelo existente para relacionar grado, asignatura, estudiante, profesor y periodo. No tiene router FastAPI detectado.
+Modelo existente para relacionar curso, asignatura, estudiante, profesor y periodo.
 
 ### Calificaciones
 
 Archivo: `entities/calificaciones.py`
 
-Modelo existente para registrar descripcion y valor de calificacion asociado a estudiante y profesor. No tiene router FastAPI detectado.
+Modelo existente para registrar descripcion y valor de calificacion asociado a estudiante, profesor y asignatura.
 
 ## Features implementadas
 
@@ -130,6 +130,63 @@ Comportamiento observado:
 - Responde 404 cuando no hay cursos o no se encuentra un curso.
 - Usa `CursoCrud` para persistencia.
 
+### CRUD de profesores por API
+
+Implementado en `routers/profesor.py`, `crud/profesor_crud.py`, `schemas/profesor_schema.py` y `entities/profesor.py`.
+
+Endpoints:
+
+- `POST /profesores/`: registra profesor.
+- `GET /profesores/`: lista profesores.
+- `GET /profesores/{id}`: consulta profesor por UUID.
+- `PUT /profesores/{id}`: actualiza profesor.
+- `DELETE /profesores/{id}`: elimina profesor.
+
+### CRUD de asignaturas por API
+
+Implementado en `routers/asignatura.py`, `crud/asignatura_crud.py`, `schemas/asignatura_schema.py` y `entities/asignatura.py`.
+
+Endpoints:
+
+- `POST /asignaturas/`: registra asignatura.
+- `GET /asignaturas/`: lista asignaturas.
+- `GET /asignaturas/{id}`: consulta asignatura por id.
+- `PUT /asignaturas/{id}`: actualiza asignatura.
+- `DELETE /asignaturas/{id}`: elimina asignatura.
+
+### CRUD de inscripciones por API
+
+Implementado en `routers/inscripcion.py`, `crud/inscripcion_crud.py`, `schemas/inscripcion_schema.py` y `entities/inscripcion.py`.
+
+Endpoints:
+
+- `POST /inscripciones/`: registra inscripcion.
+- `GET /inscripciones/`: lista inscripciones.
+- `GET /inscripciones/{id}`: consulta inscripcion por id.
+- `PUT /inscripciones/{id}`: actualiza inscripcion.
+- `DELETE /inscripciones/{id}`: elimina inscripcion.
+
+Comportamiento observado:
+
+- Valida que existan curso, asignatura, estudiante y profesor antes de crear o actualizar.
+- Usa `id_curso` en lugar de `id_grado`.
+
+### CRUD de calificaciones por API
+
+Implementado en `routers/calificaciones.py`, `crud/calificaciones_crud.py`, `schemas/calificacion_schema.py` y `entities/calificaciones.py`.
+
+Endpoints:
+
+- `POST /calificaciones/`: registra calificacion.
+- `GET /calificaciones/`: lista calificaciones.
+- `GET /calificaciones/{id}`: consulta calificacion por id.
+- `PUT /calificaciones/{id}`: actualiza calificacion.
+- `DELETE /calificaciones/{id}`: elimina calificacion.
+
+Comportamiento observado:
+
+- Valida que existan estudiante, profesor y asignatura antes de crear o actualizar.
+
 ### Menu de consola
 
 Implementado en `main.py`.
@@ -147,7 +204,7 @@ Permite:
 2. Ejecuta `Base.metadata.create_all(bind=engine)`.
 3. Crea instancia `FastAPI`.
 4. Configura CORS abierto.
-5. Incluye routers de estudiantes y cursos.
+5. Incluye routers de estudiantes, cursos, profesores, asignaturas, inscripciones y calificaciones.
 6. Cada endpoint solicita una sesion mediante `get_db()`.
 7. El router valida datos con Pydantic.
 8. El router instancia el CRUD correspondiente.
@@ -171,16 +228,16 @@ Permite:
 - Clases CRUD en PascalCase con sufijo `Crud`.
 - Schemas Pydantic con sufijos `Base`, `Create`, `Response` y `ResponseGet`.
 - Routers con prefijo plural: `/estudiantes`, `/cursos`.
-- Identificadores UUID para estudiantes y cursos.
-- Tablas con nombres en espanol: `estudiantes`, `curso`, `profesores`, `materias`, `inscripcion`, `calificaciones`.
+- Identificadores UUID para estudiantes, cursos y profesores, conservando el contrato existente.
+- Identificadores enteros para asignaturas, inscripciones y calificaciones.
+- Tablas con nombres en espanol: `estudiantes`, `curso`, `profesores`, `asignatura`, `inscripcion`, `calificaciones`.
 
 ## Riesgos y observaciones
 
 - No se detecto archivo `requirements.txt`, aunque el README lo menciona.
 - No se detecto suite de pruebas.
 - Hay cambios previos no confirmados en `routers/estudiante.py`.
-- `crud/profesor_crud.py`, `crud/inscripcion_crud.py` y `crud/calificaciones_crud.py` importan desde modulos que parecen incorrectos para su ubicacion actual.
-- `entities/inscripcion.py` y `entities/calificaciones.py` tienen imports duplicados o inconsistentes.
+- El diagrama usa IDs numericos, pero estudiantes y cursos ya tenian UUID y se conservaron para no romper schemas ni endpoints existentes.
 - `app.py` documenta rutas antiguas en comentarios, pero el codigo real usa `routers/estudiante.py` y `routers/curso.py`.
 - CORS esta abierto para todos los origenes.
 
