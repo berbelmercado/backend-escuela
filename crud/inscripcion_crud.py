@@ -1,55 +1,61 @@
+from typing import List
+from uuid import UUID
+
+from entities.inscripcion import Inscripcion
 from sqlalchemy.orm import Session
-from inscripcion_crud import Inscripcion
 
 
-def crear_inscripcion(db: Session, inscripcion: Inscripcion):
-    db.add(inscripcion)
-    db.commit()
-    db.refresh(inscripcion)
-    return inscripcion
+class InscripcionCrud:
+    def __init__(self, db: Session):
+        self.db = db
 
+    def crear_inscripcion(
+        self,
+        id_curso: UUID,
+        id_asignatura: int,
+        id_estudiante: UUID,
+        id_profesor: UUID,
+        periodo: str,
+    ) -> Inscripcion:
+        inscripcion = Inscripcion(
+            id_curso=id_curso,
+            id_asignatura=id_asignatura,
+            id_estudiante=id_estudiante,
+            id_profesor=id_profesor,
+            periodo=periodo.strip(),
+        )
+        self.db.add(inscripcion)
+        self.db.commit()
+        self.db.refresh(inscripcion)
+        return inscripcion
 
-def obtener_inscripciones(db: Session):
-    return db.query(Inscripcion).all()
+    def obtener_inscripcion(self, id_inscripcion: int) -> Inscripcion:
+        return (
+            self.db.query(Inscripcion)
+            .filter(Inscripcion.id_inscripcion == id_inscripcion)
+            .first()
+        )
 
+    def obtener_inscripciones(self) -> List[Inscripcion]:
+        return self.db.query(Inscripcion).all()
 
-def obtener_inscripcion_por_id(db: Session, id_inscripcion: int):
-    return (
-        db.query(Inscripcion)
-        .filter(Inscripcion.id_inscripcion == id_inscripcion)
-        .first()
-    )
+    def actualizar_inscripcion(self, id_inscripcion: int, data: dict) -> Inscripcion:
+        inscripcion = self.obtener_inscripcion(id_inscripcion)
+        if not inscripcion:
+            raise ValueError("No existe la inscripcion para actualizar")
 
+        for key, value in data.items():
+            setattr(inscripcion, key, value)
 
-def actualizar_inscripcion(db: Session, id_inscripcion: int, datos):
-    inscripcion = (
-        db.query(Inscripcion)
-        .filter(Inscripcion.id_inscripcion == id_inscripcion)
-        .first()
-    )
+        self.db.commit()
+        self.db.refresh(inscripcion)
+        return inscripcion
 
-    if inscripcion:
-        inscripcion.id_grado = datos.id_grado
-        inscripcion.id_asignatura = datos.id_asignatura
-        inscripcion.id_estudiante = datos.id_estudiante
-        inscripcion.id_profesor = datos.id_profesor
-        inscripcion.periodo = datos.periodo
+    def eliminar_inscripcion(self, id_inscripcion: int) -> bool:
+        inscripcion = self.obtener_inscripcion(id_inscripcion)
+        if not inscripcion:
+            raise ValueError("No existe la inscripcion")
 
-        db.commit()
-        db.refresh(inscripcion)
-
-    return inscripcion
-
-
-def eliminar_inscripcion(db: Session, id_inscripcion: int):
-    inscripcion = (
-        db.query(Inscripcion)
-        .filter(Inscripcion.id_inscripcion == id_inscripcion)
-        .first()
-    )
-
-    if inscripcion:
-        db.delete(inscripcion)
-        db.commit()
-
-    return inscripcion
+        self.db.delete(inscripcion)
+        self.db.commit()
+        return True

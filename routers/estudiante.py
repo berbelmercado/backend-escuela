@@ -19,6 +19,7 @@ from sqlalchemy.orm import Session
 from uuid import UUID
 from database.config import SessionLocal
 from crud.estudiante_crud import EstudianteCrud
+from entities.estudiante import Estudiante
 from schemas.estudiante_schema import (
     EstudianteCreate,
     EstudianteResponse,
@@ -61,24 +62,14 @@ def get_db():
     },
 )
 def create_estudiante(estudiante: EstudianteCreate, db: Session = Depends(get_db)):
-    """
-    Crea un nuevo estudiante en la base de datos.
-
-    Validaciones:
-    - Si ya existe un estudiante con el mismo email -> 409
-    - Si ya existe un estudiante con la misma cédula -> 409
-
-    Parámetros:
-    - estudiante: EstudianteCreate (datos de entrada).
-    - db: Sesión de base de datos proporcionada por get_db.
-
-    Devuelve:
-    - EstudianteResponse con los campos del estudiante creado y un mensaje.
-    """
     try:
+        from entities.estudiante import (
+            Estudiante,
+        )  # 👈 asegúrate de importar la entidad
+
         # Validar que no exista un estudiante con el mismo email
         email_exists = (
-            db.query(EstudianteCrud)
+            db.query(Estudiante)  # ✅ Estudiante, no EstudianteCrud
             .filter(Estudiante.email == estudiante.email)
             .first()
         )
@@ -352,6 +343,6 @@ def delete_estudiante(id: UUID, db: Session = Depends(get_db)):
         crud.eliminar_estudiante(id)
         return {"message": "Estudiante eliminado"}
     except ValueError as e:
-        raise HTTPException(404, str(e))
+        raise HTTPException(status_code=404, detail=str(e))  # 👈 detail= explícito
     except Exception as e:
-        raise HTTPException(500, f"Error al eliminar el estudiante: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
