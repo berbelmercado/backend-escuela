@@ -15,3 +15,4 @@ class Curso(Base):
     )
     nombre_curso = Column(String(100), nullable=False)
     fecha_creacion = Column(DateTime, server_default=func.now())
+    inscripciones = relationship("Inscripcion", back_populates="curso")

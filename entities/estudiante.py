@@ -21,3 +21,5 @@ class Estudiante(Base):
     fecha_nacimiento = Column(Date, nullable=False)
     no_celular = Column(String(20), nullable=True)
     fecha_creacion = Column(DateTime, server_default=func.now())
+    inscripciones = relationship("Inscripcion", back_populates="estudiante")
+    calificaciones = relationship("Calificaciones", back_populates="estudiante")
