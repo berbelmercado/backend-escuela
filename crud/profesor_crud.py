@@ -1,42 +1,52 @@
+from typing import List
+from uuid import UUID
+
+from entities.profesor import Profesor
 from sqlalchemy.orm import Session
-from profesor_crud import Profesor
 
 
-def crear_profesor(db: Session, profesor: Profesor):
-    db.add(profesor)
-    db.commit()
-    db.refresh(profesor)
-    return profesor
+class ProfesorCrud:
+    def __init__(self, db: Session):
+        self.db = db
 
+    def crear_profesor(
+        self, cedula: str, nombre: str, apellido: str, sexo: str, edad: int
+    ) -> Profesor:
+        profesor = Profesor(
+            cedula=cedula.strip(),
+            nombre=nombre.strip().title(),
+            apellido=apellido.strip().title(),
+            sexo=sexo.strip().title(),
+            edad=edad,
+        )
+        self.db.add(profesor)
+        self.db.commit()
+        self.db.refresh(profesor)
+        return profesor
 
-def obtener_profesores(db: Session):
-    return db.query(Profesor).all()
+    def obtener_profesor(self, id_profesor: UUID) -> Profesor:
+        return self.db.query(Profesor).filter(Profesor.id_profesor == id_profesor).first()
 
+    def obtener_profesores(self) -> List[Profesor]:
+        return self.db.query(Profesor).all()
 
-def obtener_profesor_por_id(db: Session, id_profesor: int):
-    return db.query(Profesor).filter(Profesor.id_profesor == id_profesor).first()
+    def actualizar_profesor(self, id_profesor: UUID, data: dict) -> Profesor:
+        profesor = self.obtener_profesor(id_profesor)
+        if not profesor:
+            raise ValueError("No existe el profesor para actualizar")
 
+        for key, value in data.items():
+            setattr(profesor, key, value)
 
-def actualizar_profesor(db: Session, id_profesor: int, datos):
-    profesor = db.query(Profesor).filter(Profesor.id_profesor == id_profesor).first()
+        self.db.commit()
+        self.db.refresh(profesor)
+        return profesor
 
-    if profesor:
-        profesor.nombre_profesor = datos.nombre_profesor
-        profesor.apellido_profesor = datos.apellido_profesor
-        profesor.sexo_profesor = datos.sexo_profesor
-        profesor.edad = datos.edad
+    def eliminar_profesor(self, id_profesor: UUID) -> bool:
+        profesor = self.obtener_profesor(id_profesor)
+        if not profesor:
+            raise ValueError("No existe el profesor")
 
-        db.commit()
-        db.refresh(profesor)
-
-    return profesor
-
-
-def eliminar_profesor(db: Session, id_profesor: int):
-    profesor = db.query(Profesor).filter(Profesor.id_profesor == id_profesor).first()
-
-    if profesor:
-        db.delete(profesor)
-        db.commit()
-
-    return profesor
+        self.db.delete(profesor)
+        self.db.commit()
+        return True

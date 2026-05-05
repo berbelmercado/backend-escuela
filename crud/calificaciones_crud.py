@@ -1,54 +1,61 @@
+from typing import List
+from uuid import UUID
+
+from entities.calificaciones import Calificaciones
 from sqlalchemy.orm import Session
-from calificaciones_crud import Calificaciones
 
 
-def crear_calificacion(db: Session, calificacion: Calificaciones):
-    db.add(calificacion)
-    db.commit()
-    db.refresh(calificacion)
-    return calificacion
+class CalificacionesCrud:
+    def __init__(self, db: Session):
+        self.db = db
 
+    def crear_calificacion(
+        self,
+        id_estudiante: UUID,
+        id_profesor: UUID,
+        id_asignatura: int,
+        descripcion_nota: str,
+        valor_nota: float,
+    ) -> Calificaciones:
+        calificacion = Calificaciones(
+            id_estudiante=id_estudiante,
+            id_profesor=id_profesor,
+            id_asignatura=id_asignatura,
+            descripcion_nota=descripcion_nota.strip(),
+            valor_nota=valor_nota,
+        )
+        self.db.add(calificacion)
+        self.db.commit()
+        self.db.refresh(calificacion)
+        return calificacion
 
-def obtener_calificaciones(db: Session):
-    return db.query(Calificaciones).all()
+    def obtener_calificacion(self, id_calificacion: int) -> Calificaciones:
+        return (
+            self.db.query(Calificaciones)
+            .filter(Calificaciones.id_calificacion == id_calificacion)
+            .first()
+        )
 
+    def obtener_calificaciones(self) -> List[Calificaciones]:
+        return self.db.query(Calificaciones).all()
 
-def obtener_calificacion_por_id(db: Session, id_calificaciones: int):
-    return (
-        db.query(Calificaciones)
-        .filter(Calificaciones.id_calificaciones == id_calificaciones)
-        .first()
-    )
+    def actualizar_calificacion(self, id_calificacion: int, data: dict) -> Calificaciones:
+        calificacion = self.obtener_calificacion(id_calificacion)
+        if not calificacion:
+            raise ValueError("No existe la calificacion para actualizar")
 
+        for key, value in data.items():
+            setattr(calificacion, key, value)
 
-def actualizar_calificacion(db: Session, id_calificaciones: int, datos):
-    calificacion = (
-        db.query(Calificaciones)
-        .filter(Calificaciones.id_calificaciones == id_calificaciones)
-        .first()
-    )
+        self.db.commit()
+        self.db.refresh(calificacion)
+        return calificacion
 
-    if calificacion:
-        calificacion.id_estudiante = datos.id_estudiante
-        calificacion.id_profesor = datos.id_profesor
-        calificacion.descripcion = datos.descripcion
-        calificacion.valor = datos.valor
+    def eliminar_calificacion(self, id_calificacion: int) -> bool:
+        calificacion = self.obtener_calificacion(id_calificacion)
+        if not calificacion:
+            raise ValueError("No existe la calificacion")
 
-        db.commit()
-        db.refresh(calificacion)
-
-    return calificacion
-
-
-def eliminar_calificacion(db: Session, id_calificaciones: int):
-    calificacion = (
-        db.query(Calificaciones)
-        .filter(Calificaciones.id_calificaciones == id_calificaciones)
-        .first()
-    )
-
-    if calificacion:
-        db.delete(calificacion)
-        db.commit()
-
-    return calificacion
+        self.db.delete(calificacion)
+        self.db.commit()
+        return True
